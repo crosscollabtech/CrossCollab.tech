@@ -1,2 +1,8 @@
-# CrossCollab.tech
-CrossCollab connects ministries, NGOs, and churches with Christian technologists to build open‑source tools that serve real needs.
+# CrossCollab Site
+
+This repository hosts the **CrossCollab** website on GitHub Pages.
+
+## Deployment
+- Source: `/docs` folder on `main` branch
+- Optional custom domain: `crosscollab.tech`
+- To update: edit `docs/index.html`, commit, and push.
