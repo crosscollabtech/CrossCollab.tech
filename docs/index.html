@@ -70,26 +70,32 @@
 </head>
 <body>
   <header>
-    <div class="container nav" aria-label="Primary">
-      <a class="brand" href="#">
-        <img src="assets/img/logo.png" alt="CrossCollab logo" height="32" />
-      </a>
+  <div class="container nav" aria-label="Primary">
+    <a class="brand" href="#">
+      <img src="assets/img/logo.png" alt="CrossCollab logo" height="40" />
+      <span>CrossCollab</span>
+    </a>
 
+    <!-- responsive toggle -->
+    <input id="menuToggle" type="checkbox" aria-label="Toggle menu" />
+    <label class="menuBtn" for="menuToggle">Menu</label>
 
-      <!-- single UL; checkbox toggles it on mobile -->
-      <input id="menuToggle" type="checkbox" aria-label="Toggle menu" />
-      <label class="menuBtn" for="menuToggle">Menu</label>
-      <nav>
-        <ul>
-          <li><a href="#projects">Projects</a></li>
-          <li><a href="#how">How it works</a></li>
-          <li><a href="#submit">Submit</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a class="btn-outline" href="https://github.com/crosscollabtech/CrossCollab.tech" target="_blank" rel="noopener">GitHub</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+    <nav>
+      <ul>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#submit">Submit</a></li>
+        <li><a href="#about">About</a></li>
+        <li>
+          <a class="btn-outline" href="https://github.com/" target="_blank" rel="noopener">
+            GitHub
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
 
   <section class="hero">
     <div class="container">
