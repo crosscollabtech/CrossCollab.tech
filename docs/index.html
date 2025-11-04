@@ -1,14 +1,216 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>CrossCollab – Code with purpose. Build for the Kingdom.</title>
-<meta name="description" content="CrossCollab connects ministries, NGOs, and churches with Christian technologists to build open‑source tools that serve real needs." />
-<meta name="theme-color" content="#211F46" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CrossCollab – Code with purpose. Build for the Kingdom.</title>
+  <meta name="description" content="CrossCollab connects ministries, NGOs, and churches with Christian technologists to build open‑source tools that serve real needs." />
+  <meta name="theme-color" content="#211F46" />
+  <style>
+    :root {
+      --bg:#211F46; --text:#fff; --title:#E87324; --accent:#70A699; --card:#272556; --muted:#BFC3D9; --border:#302e66;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Ubuntu,sans-serif;background:radial-gradient(1200px 800px at 10% 0%,#262357 0%,var(--bg) 42%),var(--bg);color:var(--text);line-height:1.6}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    img{max-width:100%;display:block}
+    .container{width:min(1100px,92%);margin-inline:auto}
+
+    /* Header */
+    header{position:sticky;top:0;z-index:50;background:rgba(33,31,70,.8);backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid var(--border)}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0}
+    .brand{display:flex;gap:.7rem;align-items:center;font-weight:800;color:var(--accent)}
+    .brand svg{width:30px;height:30px}
+
+    /* Single UL nav with checkbox toggle for mobile */
+    #menuToggle{display:none}
+    .menuBtn{display:none;border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:.5rem;padding:.4rem .7rem}
+    nav ul{display:flex;gap:1.1rem;list-style:none;margin:0;padding:0}
+    nav a{color:var(--text);opacity:.9}
+    nav a:hover{opacity:1}
+    .btn-outline{border:1px solid var(--accent);border-radius:.6rem;padding:.45rem .85rem;color:var(--accent)}
+    .btn-outline:hover{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+
+    @media (max-width:760px){
+      .menuBtn{display:inline-flex}
+      nav ul{position:absolute;left:0;right:0;top:58px;background:#1c1a3f;border-bottom:1px solid var(--border);display:none;flex-direction:column;gap:0}
+      nav ul a{display:block;padding:.9rem 1rem;border-top:1px solid #2b295a}
+      #menuToggle:checked ~ nav ul{display:block}
+    }
+
+    /* Hero */
+    .hero{padding:6rem 0 4rem;text-align:center}
+    .hero h1{margin:0 0 .7rem;font-size:clamp(2rem,3.5vw + 1rem,3.6rem);line-height:1.15;font-weight:900;color:var(--title)}
+    .hero p.lead{color:var(--muted);font-size:clamp(1rem,.8rem + .6vw,1.25rem);margin:0 auto 1.6rem;max-width:58ch}
+    .actions{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin-top:.8rem}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.8rem 1.1rem;border-radius:.6rem;font-weight:600;border:1px solid transparent;cursor:pointer}
+    .btn-primary{background:var(--title);color:#111}
+    .btn-primary:hover{filter:brightness(1.05)}
+    .btn-ghost{border:1px solid var(--accent);color:var(--accent);background:transparent}
+
+    section{padding:3.2rem 0}
+    h2{color:var(--title);margin:0 0 1rem;font-size:clamp(1.4rem,.6rem + 2.4vw,2.2rem)}
+    .grid{display:grid;gap:1rem}
+    .grid.cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+    .card{background:linear-gradient(180deg,#2a285d 0%,var(--card) 100%);border:1px solid #333071;border-radius:14px;padding:1.1rem;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .chip{display:inline-block;padding:.2rem .55rem;font-size:.8rem;border:1px solid rgba(255,255,255,.12);border-radius:999px;color:var(--muted)}
+    .meta{color:var(--muted);font-size:.92rem}
+
+    .steps{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+    .step{border-left:3px solid var(--accent);padding:.8rem 1rem;background:#25235a;border-radius:10px}
+
+    footer{border-top:1px solid var(--border);color:var(--muted);padding:2rem 0}
+    :focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 55%, transparent);outline-offset:2px}
+
+    /* inputs */
+    input,textarea{width:100%;margin-top:.35rem;padding:.75rem .85rem;background:#1f1d49;border:1px solid #333071;border-radius:10px;color:var(--text)}
+  </style>
 </head>
 <body>
-<h1 style="text-align:center;color:#E87324;">CrossCollab</h1>
-<p style="text-align:center;color:#70A699;">Code with purpose. Build for the Kingdom.</p>
+  <header>
+    <div class="container nav" aria-label="Primary">
+      <a class="brand" href="#">
+        <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+          <rect x="2" y="24" width="26" height="20" rx="3" fill="#E87324" />
+          <circle cx="15" cy="22" r="5" fill="#E87324" />
+          <rect x="36" y="20" width="26" height="22" rx="3" fill="#70A699" />
+          <circle cx="52" cy="16" r="5" fill="#70A699" />
+          <rect x="45" y="26" width="8" height="3" fill="#fff" />
+          <rect x="48.5" y="23" width="3" height="9" fill="#fff" />
+        </svg>
+        <span>CrossCollab</span>
+      </a>
+
+      <!-- single UL; checkbox toggles it on mobile -->
+      <input id="menuToggle" type="checkbox" aria-label="Toggle menu" />
+      <label class="menuBtn" for="menuToggle">Menu</label>
+      <nav>
+        <ul>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#submit">Submit</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a class="btn-outline" href="https://github.com/" target="_blank" rel="noopener">GitHub</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Code with purpose. Build for the Kingdom.</h1>
+      <p class="lead">CrossCollab connects ministries, NGOs, and churches with Christian developers to build open‑source tools. Browse projects, join a team, or submit a need.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#projects">Browse projects</a>
+        <a class="btn btn-ghost" href="#submit">Submit a project</a>
+      </div>
+      <p class="meta" style="margin-top:1rem">All projects are open‑source. GitHub‑first workflow.</p>
+    </div>
+  </section>
+
+  <section id="projects" aria-labelledby="projects-title">
+    <div class="container">
+      <h2 id="projects-title">Featured projects</h2>
+      <div class="grid cards">
+        <article class="card">
+          <div class="chip">Web • JavaScript</div>
+          <h3>Community Needs Map</h3>
+          <p>Church‑run directory of local needs and services. Contributors: frontend, mapbox integration, accessibility.</p>
+          <p class="meta">Labels: <span class="chip">good first issue</span> <span class="chip">help wanted</span></p>
+          <div style="display:flex; gap:.6rem; margin-top:.6rem">
+            <a class="btn btn-ghost" href="#">Open repo</a>
+            <a class="btn btn-primary" href="#">I want to help</a>
+          </div>
+        </article>
+        <article class="card">
+          <div class="chip">Data • Python</div>
+          <h3>Prayer & Care Analytics</h3>
+          <p>Anonymous metrics for prayer requests and follow‑ups. Needs ETL and dashboard contributors.</p>
+          <p class="meta">Labels: <span class="chip">docs</span> <span class="chip">backend</span></p>
+          <div style="display:flex; gap:.6rem; margin-top:.6rem">
+            <a class="btn btn-ghost" href="#">Open repo</a>
+            <a class="btn btn-primary" href="#">I want to help</a>
+          </div>
+        </article>
+        <article class="card">
+          <div class="chip">Mobile • Kotlin/Swift</div>
+          <h3>Mission Trip Toolkit</h3>
+          <p>Offline‑first app for itineraries, checklists, and translation snippets. Contributors needed for sync and UI.</p>
+          <p class="meta">Labels: <span class="chip">UX</span> <span class="chip">translation</span></p>
+          <div style="display:flex; gap:.6rem; margin-top:.6rem">
+            <a class="btn btn-ghost" href="#">Open repo</a>
+            <a class="btn btn-primary" href="#">I want to help</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" aria-labelledby="how-title">
+    <div class="container">
+      <h2 id="how-title">How it works</h2>
+      <div class="steps">
+        <div class="step"><h3>1. Submit</h3><p>Ministries post a need. We seed a GitHub repo with templates and labels.</p></div>
+        <div class="step"><h3>2. Match</h3><p>Contributors filter by skills and time. Good‑first‑issues prioritized.</p></div>
+        <div class="step"><h3>3. Build</h3><p>Open PRs. Clear milestones. Transparent progress and impact.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="submit" aria-labelledby="submit-title">
+    <div class="container">
+      <h2 id="submit-title">Submit a project</h2>
+      <form id="submitForm" class="card" novalidate>
+        <label><span>Organization or ministry *</span><input name="org" required placeholder="e.g., Hope Community Center" /></label>
+        <label><span>Project title *</span><input name="title" required placeholder="e.g., Volunteer Scheduling App" /></label>
+        <label><span>Contact email *</span><input type="email" name="email" required placeholder="you@example.org" /></label>
+        <label><span>Description *</span><textarea name="desc" required rows="5" placeholder="What problem are you solving? Who benefits?"></textarea></label>
+        <label><span>Tech stack</span><input name="stack" placeholder="e.g., React, FastAPI, Postgres" /></label>
+        <div style="display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.6rem">
+          <button type="submit" class="btn btn-primary">Create draft on GitHub</button>
+          <button type="reset" class="btn btn-ghost">Reset</button>
+        </div>
+        <p class="meta">Note: In MVP this creates a GitHub issue with details; later it can scaffold a repo via a GitHub App.</p>
+      </form>
+    </div>
+  </section>
+
+  <section id="about" aria-labelledby="about-title">
+    <div class="container">
+      <h2 id="about-title">About CrossCollab</h2>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem">
+        <div class="card"><h3>Open source first</h3><p>Licenses default to MIT/Apache‑2. All work lives on GitHub. Transparency and reuse drive impact.</p></div>
+        <div class="card"><h3>Faith + craft</h3><p>We pair clear doctrine‑safe guidelines with professional software practices and security basics.</p></div>
+        <div class="card"><h3>Global collaboration</h3><p>English and Spanish to start. Simple onboarding. Clear labels and contributor pathways.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center">
+      <p>© <span id="y"></span> CrossCollab • Open source • <a href="#">Code of Conduct</a></p>
+      <div style="display:flex;gap:.8rem;align-items:center">
+        <a class="chip" href="#">Twitter</a>
+        <a class="chip" href="#">GitHub</a>
+        <a class="chip" href="#">Discord</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Form demo logic
+    const form = document.getElementById('submitForm');
+    form?.addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const fd = new FormData(form); const payload = Object.fromEntries(fd.entries());
+      for (const [k,v] of fd){ if (['org','title','email','desc'].includes(k) && !String(v).trim()){ alert('Fill all required fields.'); return; } }
+      console.log('Draft payload →', payload);
+      alert('Draft created. In a real deployment this would open a GitHub issue with your details.');
+      form.reset();
+    });
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
