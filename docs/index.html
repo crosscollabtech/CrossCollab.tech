@@ -101,7 +101,7 @@
 
     /* Hero */
     .hero { padding: 6rem 0 4rem; }
-    .hero-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: center; }
+    .hero-stack { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; text-align: center; }
     .crt-panel {
       background: linear-gradient(135deg, rgba(20,20,47,.8), rgba(30,28,71,.75));
       border: 1px solid var(--border);
@@ -116,7 +116,7 @@
     .crt-panel::after { content:""; position:absolute; inset:0; background:radial-gradient(circle at 10% 20%, rgba(112,166,153,.1), transparent 40%), radial-gradient(circle at 90% 10%, rgba(232,115,36,.1), transparent 35%); pointer-events:none; opacity:.9; }
     .hero h1 { margin: 0 0 .7rem; font-size: clamp(2.1rem,3.5vw + 1rem,3.8rem); line-height: 1.15; font-weight: 900; color: var(--title); text-shadow: var(--glow); }
     .hero p.lead { color: var(--muted); font-size: clamp(1rem,.8rem + .6vw,1.25rem); margin: 0 auto 1.1rem; max-width: 58ch; }
-    .actions { display: flex; gap: .8rem; justify-content: flex-start; flex-wrap: wrap; margin-top: 1.2rem; }
+    .actions { display: flex; gap: .8rem; justify-content: center; flex-wrap: wrap; margin-top: .5rem; }
     .btn { display: inline-flex; align-items: center; gap: .5rem; padding: .85rem 1.2rem; border-radius: .7rem; font-weight: 700; letter-spacing: .04em; border: 1px solid transparent; cursor: pointer; transition: transform .18s ease, filter .18s ease, box-shadow .18s ease; }
     .btn-primary { background: linear-gradient(120deg, #e87324, #f39d4c); color: #0f0d26; box-shadow: var(--glow); }
     .btn-primary:hover { filter: brightness(1.05); transform: translateY(-2px); }
@@ -126,6 +126,9 @@
     .console-line { color: #9fe3ce; font-size: .95rem; display: flex; gap: .6rem; align-items: center; }
     .prompt { color: #e87324; }
     .blink { animation: blink 1.1s steps(2, start) infinite; }
+    .console-body { display: grid; gap: .7rem; justify-items: start; }
+    .console-shell { width: min(900px, 100%); margin-inline: auto; padding: 1.4rem; display: grid; gap: .9rem; }
+    .hero .stat-stack { width: min(900px, 100%); margin-inline: auto; }
     .stat-stack { display: grid; gap: .6rem; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); margin-top: 1rem; }
     .stat { background: rgba(20,20,47,.7); border: 1px solid var(--border); border-radius: 12px; padding: .8rem 1rem; color: var(--muted); box-shadow: inset 0 0 0 1px rgba(255,255,255,.02); }
     .stat strong { display: block; color: var(--text); font-size: 1.05rem; }
@@ -151,6 +154,18 @@
 
     .steps { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); }
     .step { border-left: 3px solid var(--accent); padding: .95rem 1rem; background: #171633; border-radius: 12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.02); }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
 
     footer { border-top: 1px solid var(--border); color: var(--muted); padding: 2rem 0; background: rgba(12,11,28,.85); position: relative; z-index: 2; }
     :focus-visible { outline: 3px solid color-mix(in srgb,var(--accent) 55%, transparent); outline-offset: 2px; }
@@ -230,28 +245,25 @@
 
 
   <section class="hero">
-    <div class="container hero-grid">
-      <div class="crt-panel">
-        <h1>Code with purpose. Build for the Kingdom.</h1>
-        <p class="lead">CrossCollab connects ministries, NGOs, and churches with Christian developers to build open‑source tools. Browse projects, join a team, or submit a need.</p>
-        <div class="actions">
-          <a class="btn btn-primary" href="#projects">Browse projects</a>
-          <a class="btn btn-ghost" href="#submit">Submit a project</a>
-        </div>
-        <div class="stat-stack">
-          <div class="stat"><strong>GitHub‑first</strong><span>Issues, milestones, and PR etiquette baked in.</span></div>
-          <div class="stat"><strong>Open source</strong><span>MIT/Apache and transparent impact metrics.</span></div>
-          <div class="stat"><strong>Global crews</strong><span>Remote friendly, async, clear comms.</span></div>
+    <div class="container hero-stack">
+      <h1 class="sr-only">CrossCollab mission console</h1>
+      <div class="bezel console-shell" role="presentation">
+        <div class="console-body">
+          <div class="console-line"><span class="prompt">$</span><span>mission.intro()</span></div>
+          <div class="console-line"><span class="prompt">⤷</span><span>I want the Code with purpose. Build for the Kingdom.</span></div>
+          <div class="console-line"><span class="prompt">⤷</span><span>CrossCollab connects ministries, NGOs, and churches with Christian developers to build open‑source tools.</span></div>
+          <div class="console-line"><span class="prompt">⤷</span><span>Browse projects, join a team, or submit a need.</span></div>
+          <div class="console-line"><span class="prompt">$</span><span>mission.ready()</span><span class="blink">▌</span></div>
         </div>
       </div>
-      <div class="bezel" role="presentation">
-        <div style="padding:1.4rem; display:grid; gap:.9rem;">
-          <div class="console-line"><span class="prompt">$</span><span>npx connect --with faith</span><span class="blink">▌</span></div>
-          <div class="console-line"><span class="prompt">⤷</span><span>Scanning repos... found community_needs_map</span></div>
-          <div class="console-line"><span class="prompt">⤷</span><span>New contributors: ready // mentorship: on</span></div>
-          <div class="console-line"><span class="prompt">⤷</span><span>Deploy pipeline healthy • security baseline verified</span></div>
-          <div class="console-line"><span class="prompt">$</span><span>mission.ready()</span></div>
-        </div>
+      <div class="actions">
+        <a class="btn btn-primary" href="#projects">Browse projects</a>
+        <a class="btn btn-ghost" href="#submit">Submit a project</a>
+      </div>
+      <div class="stat-stack">
+        <div class="stat"><strong>GitHub‑first</strong><span>Issues, milestones, and PR etiquette baked in.</span></div>
+        <div class="stat"><strong>Open source</strong><span>MIT/Apache and transparent impact metrics.</span></div>
+        <div class="stat"><strong>Global crews</strong><span>Remote friendly, async, clear comms.</span></div>
       </div>
     </div>
   </section>
