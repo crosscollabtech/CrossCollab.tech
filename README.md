@@ -25,17 +25,18 @@ To see technology used as a tool for service, collaboration, and Gospel-centered
 
 ## 🧩 How It Works
 
-1. **Organizations submit a project idea or need**  
-   (websites, apps, internal tools, data solutions, etc.)
+1. **Organizations submit a project idea or need**
+   - **Simple requests** (no repo): e.g., update donor lists, set up livestreams, configure tools.
+   - **Build projects** (with repo): e.g., ministry websites, mobile apps, data pipelines.
 
-2. **A GitHub repository is created or linked**  
+2. **A GitHub repository is created or linked for build projects**
    With clear goals, issues, and contribution guidelines.
 
-3. **Developers join and collaborate**  
+3. **Developers join and collaborate**
    By picking issues, submitting PRs, and building together.
 
-4. **Impact is delivered**  
-   Through usable software that serves people and ministries.
+4. **Impact is delivered**
+   Through usable software or completed service work that serves people and ministries.
 
 ---
 
