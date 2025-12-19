@@ -156,7 +156,7 @@
     :focus-visible { outline: 3px solid color-mix(in srgb,var(--accent) 55%, transparent); outline-offset: 2px; }
 
     /* inputs */
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       margin-top: .35rem;
       padding: .75rem .85rem;
@@ -302,11 +302,24 @@
         </article>
       </div>
       <form id="submitForm" class="card" novalidate>
+        <fieldset style="border:none; padding:0; margin:0 0 1rem;">
+          <legend style="color:var(--title); font-weight:700; margin-bottom:.35rem;">Project type *</legend>
+          <div style="display:flex; gap:.9rem; flex-wrap:wrap; align-items:center;">
+            <label style="display:flex; gap:.35rem; align-items:center;">
+              <input type="radio" name="projectType" value="service" checked /> <span>Service / setup help</span>
+            </label>
+            <label style="display:flex; gap:.35rem; align-items:center;">
+              <input type="radio" name="projectType" value="build" /> <span>Build a product</span>
+            </label>
+          </div>
+          <p id="typeHint" class="meta" style="margin:.45rem 0 0;">Great for quick help like cleaning lists, setting up livestreaming, or organizing existing tools.</p>
+        </fieldset>
         <label><span>Organization or ministry *</span><input name="org" required placeholder="e.g., Hope Community Center" /></label>
         <label><span>Project title *</span><input name="title" required placeholder="e.g., Volunteer Scheduling App" /></label>
         <label><span>Contact email *</span><input type="email" name="email" required placeholder="you@example.org" /></label>
-        <label><span>Description *</span><textarea name="desc" required rows="5" placeholder="What problem are you solving? Who benefits?"></textarea></label>
-        <label><span>Tech stack</span><input name="stack" placeholder="e.g., React, FastAPI, Postgres" /></label>
+        <label data-role="desc-label"><span>What do you need done? *</span><textarea name="desc" required rows="5" placeholder="Describe the job in plain language. Example: “Please tidy our donor spreadsheet and remove duplicates.”"></textarea></label>
+        <div id="typeFields" class="grid" style="gap:.6rem; margin:.6rem 0 0;"></div>
+        <label><span>Tech stack (optional)</span><input name="stack" placeholder="Skip if unsure. Examples: WordPress, React, FastAPI, spreadsheets" /></label>
         <div style="display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.6rem">
           <button type="submit" class="btn btn-primary">Create draft on GitHub</button>
           <button type="reset" class="btn btn-ghost">Reset</button>
@@ -341,13 +354,71 @@
   <script>
     // Form demo logic
     const form = document.getElementById('submitForm');
+    const typeHint = document.getElementById('typeHint');
+    const typeFields = document.getElementById('typeFields');
+    const descLabel = form?.querySelector('[data-role="desc-label"] span');
+    const descInput = form?.elements['desc'];
+    const typeConfigs = {
+      service: {
+        hint: 'Great for quick help like cleaning lists, setting up livestreaming, or organizing existing tools.',
+        descLabel: 'What do you need done?',
+        placeholder: 'Describe the job in plain language. Example: “Please tidy our donor spreadsheet and remove duplicates.”',
+        extras: `
+          <label><span>Current tools (optional)</span><input name="tools" placeholder="Tell us what you're using now, e.g., Zoom, Google Sheets, Mailchimp" /></label>
+          <label><span>How soon do you need help? (optional)</span>
+            <select name="timeline">
+              <option value="">No rush / flexible</option>
+              <option value="this-month">This month</option>
+              <option value="this-week">This week</option>
+            </select>
+          </label>
+        `
+      },
+      build: {
+        hint: 'For websites, apps, or data tools. Describe the audience and we will suggest simple next steps—no jargon needed.',
+        descLabel: 'What are you hoping to build?',
+        placeholder: 'Example: “A simple site where volunteers can sign up for shifts and we can export a list for emailing.”',
+        extras: `
+          <label><span>Who will use it? (optional)</span><input name="audience" placeholder="Example: Volunteers scheduling shifts; pastors reviewing notes" /></label>
+          <label><span>Content & data (optional)</span><textarea name="content" rows="3" placeholder="Links to existing materials, forms, or data sources. Plain language is fine."></textarea></label>
+          <label><span>Deployment preference (optional)</span>
+            <select name="hosting">
+              <option value="">Help me pick</option>
+              <option value="website">Website</option>
+              <option value="mobile">Mobile app</option>
+              <option value="dashboard">Dashboard / report</option>
+            </select>
+          </label>
+        `
+      }
+    };
+
+    const applyTypeConfig = (type) => {
+      const config = typeConfigs[type] || typeConfigs.service;
+      if (typeHint) typeHint.textContent = config.hint;
+      if (descLabel) descLabel.textContent = `${config.descLabel} *`;
+      if (descInput) descInput.placeholder = config.placeholder;
+      if (typeFields) typeFields.innerHTML = config.extras;
+    };
+
+    const typeRadios = form?.querySelectorAll('input[name="projectType"]');
+    typeRadios?.forEach(r => r.addEventListener('change', (e)=> applyTypeConfig(e.target.value)));
+    applyTypeConfig(form?.querySelector('input[name="projectType"]:checked')?.value || 'service');
+
+    form?.addEventListener('reset', ()=> {
+      setTimeout(()=> applyTypeConfig(form.querySelector('input[name="projectType"]:checked')?.value || 'service'), 0);
+    });
+
     form?.addEventListener('submit',(e)=>{
       e.preventDefault();
       const fd = new FormData(form); const payload = Object.fromEntries(fd.entries());
+      const selectedType = form.querySelector('input[name="projectType"]:checked')?.value;
+      if (!selectedType) { alert('Choose a project type.'); return; }
       for (const [k,v] of fd){ if (['org','title','email','desc'].includes(k) && !String(v).trim()){ alert('Fill all required fields.'); return; } }
       console.log('Draft payload →', payload);
       alert('Draft created. In a real deployment this would open a GitHub issue with your details.');
       form.reset();
+      applyTypeConfig('service');
     });
     document.getElementById('y').textContent = new Date().getFullYear();
   </script>
