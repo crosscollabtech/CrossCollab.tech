@@ -171,6 +171,22 @@
       border: 0;
     }
 
+    /* Filter bar */
+    .filter-bar { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .filter-btn { background: rgba(20,20,47,.8); border: 1px solid var(--border); color: var(--muted); padding: .4rem .8rem; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: .85rem; transition: border-color .18s, color .18s, background .18s; }
+    .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+    .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(112,166,153,.12); }
+    .projects-empty { color: var(--muted); text-align: center; padding: 2rem 1rem; grid-column: 1 / -1; }
+    .projects-loading { color: var(--muted); text-align: center; padding: 2rem 1rem; grid-column: 1 / -1; }
+
+    /* Form feedback */
+    .form-msg { padding: .75rem 1rem; border-radius: 10px; margin-top: .6rem; font-size: .9rem; display: none; }
+    .form-msg.success { display: block; background: rgba(112,166,153,.15); border: 1px solid var(--accent); color: var(--accent); }
+    .form-msg.error { display: block; background: rgba(232,115,36,.12); border: 1px solid var(--title); color: var(--title); }
+    .field-error { border-color: var(--title) !important; }
+    .field-error-msg { color: var(--title); font-size: .8rem; margin-top: .2rem; }
+    .hp-field { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; overflow: hidden; }
+
     footer { border-top: 1px solid var(--border); color: var(--muted); padding: 2rem 0; background: rgba(12,11,28,.85); position: relative; z-index: 2; }
     :focus-visible { outline: 3px solid color-mix(in srgb,var(--accent) 55%, transparent); outline-offset: 2px; }
 
@@ -222,7 +238,7 @@
   <div class="noise" aria-hidden="true"></div>
   <header>
     <div class="container nav" aria-label="Primary">
-      <a class="brand" href="#">
+      <a class="brand" href="/">
         <img src="assets/img/logo.png" alt="CrossCollab logo" height="72" />
       </a>
 
@@ -275,37 +291,11 @@
   <section id="projects" aria-labelledby="projects-title">
     <div class="container">
       <h2 id="projects-title">Featured missions</h2>
-      <div class="grid cards">
-        <article class="card">
-          <div class="chip">Web • JavaScript</div>
-          <h3>Community Needs Map</h3>
-          <p>Church‑run directory of local needs and services. Contributors: frontend, mapbox integration, accessibility.</p>
-          <p class="meta">Labels: <span class="chip">good first issue</span> <span class="chip">help wanted</span></p>
-          <div style="display:flex; gap:.6rem; margin-top:.6rem">
-            <a class="btn btn-ghost" href="#">Open repo</a>
-            <a class="btn btn-primary" href="#">I want to help</a>
-          </div>
-        </article>
-        <article class="card">
-          <div class="chip">Data • Python</div>
-          <h3>Prayer & Care Analytics</h3>
-          <p>Anonymous metrics for prayer requests and follow‑ups. Needs ETL and dashboard contributors.</p>
-          <p class="meta">Labels: <span class="chip">docs</span> <span class="chip">backend</span></p>
-          <div style="display:flex; gap:.6rem; margin-top:.6rem">
-            <a class="btn btn-ghost" href="#">Open repo</a>
-            <a class="btn btn-primary" href="#">I want to help</a>
-          </div>
-        </article>
-        <article class="card">
-          <div class="chip">Mobile • Kotlin/Swift</div>
-          <h3>Mission Trip Toolkit</h3>
-          <p>Offline‑first app for itineraries, checklists, and translation snippets. Contributors needed for sync and UI.</p>
-          <p class="meta">Labels: <span class="chip">UX</span> <span class="chip">translation</span></p>
-          <div style="display:flex; gap:.6rem; margin-top:.6rem">
-            <a class="btn btn-ghost" href="#">Open repo</a>
-            <a class="btn btn-primary" href="#">I want to help</a>
-          </div>
-        </article>
+      <div class="filter-bar" role="toolbar" aria-label="Filter projects by language">
+        <button class="filter-btn active" data-filter="all">All</button>
+      </div>
+      <div id="projectGrid" class="grid cards">
+        <p class="projects-loading">Loading projects from GitHub&hellip;</p>
       </div>
     </div>
   </section>
@@ -359,10 +349,12 @@
         <label data-role="desc-label"><span>What do you need done? *</span><textarea name="desc" required rows="5" placeholder="Describe the job in plain language. Example: “Please tidy our donor spreadsheet and remove duplicates.”"></textarea></label>
         <div id="typeFields" class="grid" style="gap:.6rem; margin:.6rem 0 0;"></div>
         <label><span>Tech stack (optional)</span><input name="stack" placeholder="Skip if unsure. Examples: WordPress, React, FastAPI, spreadsheets" /></label>
+        <div class="hp-field" aria-hidden="true"><label>Leave blank <input name="website" tabindex="-1" autocomplete="off" /></label></div>
         <div style="display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.6rem">
           <button type="submit" class="btn btn-primary">Create draft on GitHub</button>
           <button type="reset" class="btn btn-ghost">Reset</button>
         </div>
+        <div id="formMsg" class="form-msg" role="status" aria-live="polite"></div>
         <p class="meta">Note: In MVP this creates a GitHub issue with details; later it can scaffold a repo via a GitHub App.</p>
       </form>
     </div>
@@ -381,33 +373,102 @@
 
   <footer>
     <div class="container" style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center">
-      <p>© <span id="y"></span> CrossCollab • Open source • <a href="#">Code of Conduct</a></p>
+      <p>© <span id="y"></span> CrossCollab • Open source • <a href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/" target="_blank" rel="noopener">Code of Conduct</a></p>
       <div style="display:flex;gap:.8rem;align-items:center">
-        <a class="chip" href="#">Twitter</a>
-        <a class="chip" href="#">GitHub</a>
-        <a class="chip" href="#">Discord</a>
+        <a class="chip" href="https://x.com/crosscollabtech" target="_blank" rel="noopener">Twitter</a>
+        <a class="chip" href="https://github.com/crosscollabtech" target="_blank" rel="noopener">GitHub</a>
+        <a class="chip" href="https://discord.gg/crosscollab" target="_blank" rel="noopener">Discord</a>
       </div>
     </div>
   </footer>
 
   <script>
-    // Form demo logic
+    /* ── GitHub API: live project cards ── */
+    const GITHUB_ORG = 'crosscollabtech';
+    const projectGrid = document.getElementById('projectGrid');
+    const filterBar = document.querySelector('.filter-bar');
+    let allRepos = [];
+
+    const fallbackProjects = [
+      { name: 'Community Needs Map', lang: 'JavaScript', desc: 'Church-run directory of local needs and services. Contributors: frontend, mapbox integration, accessibility.', url: 'https://github.com/crosscollabtech', topics: ['good first issue', 'help wanted'] },
+      { name: 'Prayer & Care Analytics', lang: 'Python', desc: 'Anonymous metrics for prayer requests and follow-ups. Needs ETL and dashboard contributors.', url: 'https://github.com/crosscollabtech', topics: ['docs', 'backend'] },
+      { name: 'Mission Trip Toolkit', lang: 'Kotlin', desc: 'Offline-first app for itineraries, checklists, and translation snippets. Contributors needed for sync and UI.', url: 'https://github.com/crosscollabtech', topics: ['UX', 'translation'] }
+    ];
+
+    function renderCard(repo) {
+      const lang = repo.lang || 'Misc';
+      const topics = (repo.topics || []).map(t => `<span class=”chip”>${t}</span>`).join(' ');
+      return `<article class=”card” data-lang=”${lang}”>
+        <div class=”chip”>${lang}</div>
+        <h3>${repo.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</h3>
+        <p>${repo.desc || 'No description yet.'}</p>
+        ${topics ? `<p class=”meta”>Topics: ${topics}</p>` : ''}
+        <div style=”display:flex;gap:.6rem;margin-top:.6rem”>
+          <a class=”btn btn-ghost” href=”${repo.url}” target=”_blank” rel=”noopener”>Open repo</a>
+          <a class=”btn btn-primary” href=”${repo.url}/issues” target=”_blank” rel=”noopener”>I want to help</a>
+        </div>
+      </article>`;
+    }
+
+    function renderProjects(repos) {
+      if (!repos.length) {
+        projectGrid.innerHTML = '<p class=”projects-empty”>No projects match this filter.</p>';
+        return;
+      }
+      projectGrid.innerHTML = repos.map(renderCard).join('');
+    }
+
+    function buildFilterButtons(repos) {
+      const langs = [...new Set(repos.map(r => r.lang || 'Misc'))].sort();
+      filterBar.innerHTML = '<button class=”filter-btn active” data-filter=”all”>All</button>' +
+        langs.map(l => `<button class=”filter-btn” data-filter=”${l}”>${l}</button>`).join('');
+    }
+
+    filterBar?.addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      const filtered = filter === 'all' ? allRepos : allRepos.filter(r => (r.lang || 'Misc') === filter);
+      renderProjects(filtered);
+    });
+
+    async function loadProjects() {
+      try {
+        const res = await fetch(`https://api.github.com/orgs/${GITHUB_ORG}/repos?sort=updated&per_page=30`);
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+        allRepos = data
+          .filter(r => !r.fork && !r.archived)
+          .map(r => ({ name: r.name, lang: r.language || 'Misc', desc: r.description, url: r.html_url, topics: r.topics || [] }));
+        if (!allRepos.length) throw new Error('empty');
+      } catch {
+        allRepos = fallbackProjects;
+      }
+      buildFilterButtons(allRepos);
+      renderProjects(allRepos);
+    }
+    loadProjects();
+
+    /* ── Form logic ── */
     const form = document.getElementById('submitForm');
     const typeHint = document.getElementById('typeHint');
     const typeFields = document.getElementById('typeFields');
-    const descLabel = form?.querySelector('[data-role="desc-label"] span');
+    const formMsg = document.getElementById('formMsg');
+    const descLabel = form?.querySelector('[data-role=”desc-label”] span');
     const descInput = form?.elements['desc'];
     const typeConfigs = {
       service: {
         descLabel: 'What do you need done?',
         placeholder: 'Describe the job in plain language. Example: “Please tidy our donor spreadsheet and remove duplicates.”',
         extras: `
-          <label><span>Current tools (optional)</span><input name="tools" placeholder="Tell us what you're using now, e.g., Zoom, Google Sheets, Mailchimp" /></label>
+          <label><span>Current tools (optional)</span><input name=”tools” placeholder=”Tell us what you're using now, e.g., Zoom, Google Sheets, Mailchimp” /></label>
           <label><span>How soon do you need help? (optional)</span>
-            <select name="timeline">
-              <option value="">No rush / flexible</option>
-              <option value="this-month">This month</option>
-              <option value="this-week">This week</option>
+            <select name=”timeline”>
+              <option value=””>No rush / flexible</option>
+              <option value=”this-month”>This month</option>
+              <option value=”this-week”>This week</option>
             </select>
           </label>
         `
@@ -416,19 +477,42 @@
         descLabel: 'What are you hoping to build?',
         placeholder: 'Example: “A simple site where volunteers can sign up for shifts and we can export a list for emailing.”',
         extras: `
-          <label><span>Who will use it? (optional)</span><input name="audience" placeholder="Example: Volunteers scheduling shifts; pastors reviewing notes" /></label>
-          <label><span>Content & data (optional)</span><textarea name="content" rows="3" placeholder="Links to existing materials, forms, or data sources. Plain language is fine."></textarea></label>
+          <label><span>Who will use it? (optional)</span><input name=”audience” placeholder=”Example: Volunteers scheduling shifts; pastors reviewing notes” /></label>
+          <label><span>Content & data (optional)</span><textarea name=”content” rows=”3” placeholder=”Links to existing materials, forms, or data sources. Plain language is fine.”></textarea></label>
           <label><span>Deployment preference (optional)</span>
-            <select name="hosting">
-              <option value="">Help me pick</option>
-              <option value="website">Website</option>
-              <option value="mobile">Mobile app</option>
-              <option value="dashboard">Dashboard / report</option>
+            <select name=”hosting”>
+              <option value=””>Help me pick</option>
+              <option value=”website”>Website</option>
+              <option value=”mobile”>Mobile app</option>
+              <option value=”dashboard”>Dashboard / report</option>
             </select>
           </label>
         `
       }
     };
+
+    function showMsg(type, text) {
+      formMsg.className = 'form-msg ' + type;
+      formMsg.textContent = text;
+      if (type === 'success') setTimeout(() => { formMsg.className = 'form-msg'; formMsg.textContent = ''; }, 6000);
+    }
+
+    function clearErrors() {
+      form.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+      form.querySelectorAll('.field-error-msg').forEach(el => el.remove());
+      formMsg.className = 'form-msg';
+      formMsg.textContent = '';
+    }
+
+    function markFieldError(name, msg) {
+      const field = form.elements[name];
+      if (!field) return;
+      field.classList.add('field-error');
+      const err = document.createElement('div');
+      err.className = 'field-error-msg';
+      err.textContent = msg;
+      field.parentElement.appendChild(err);
+    }
 
     const applyTypeConfig = (type) => {
       const config = typeConfigs[type] || typeConfigs.service;
@@ -438,25 +522,47 @@
       if (typeFields) typeFields.innerHTML = config.extras;
     };
 
-    const typeRadios = form?.querySelectorAll('input[name="projectType"]');
-    typeRadios?.forEach(r => r.addEventListener('change', (e)=> applyTypeConfig(e.target.value)));
-    applyTypeConfig(form?.querySelector('input[name="projectType"]:checked')?.value || 'service');
+    const typeRadios = form?.querySelectorAll('input[name=”projectType”]');
+    typeRadios?.forEach(r => r.addEventListener('change', (e) => applyTypeConfig(e.target.value)));
+    applyTypeConfig(form?.querySelector('input[name=”projectType”]:checked')?.value || 'service');
 
-    form?.addEventListener('reset', ()=> {
-      setTimeout(()=> applyTypeConfig(form.querySelector('input[name="projectType"]:checked')?.value || 'service'), 0);
+    form?.addEventListener('reset', () => {
+      clearErrors();
+      setTimeout(() => applyTypeConfig(form.querySelector('input[name=”projectType”]:checked')?.value || 'service'), 0);
     });
 
-    form?.addEventListener('submit',(e)=>{
+    form?.addEventListener('submit', (e) => {
       e.preventDefault();
-      const fd = new FormData(form); const payload = Object.fromEntries(fd.entries());
-      const selectedType = form.querySelector('input[name="projectType"]:checked')?.value;
-      if (!selectedType) { alert('Choose a project type.'); return; }
-      for (const [k,v] of fd){ if (['org','title','email','desc'].includes(k) && !String(v).trim()){ alert('Fill all required fields.'); return; } }
+      clearErrors();
+
+      // Honeypot check
+      if (form.elements['website']?.value) return;
+
+      const fd = new FormData(form);
+      const selectedType = form.querySelector('input[name=”projectType”]:checked')?.value;
+      if (!selectedType) { showMsg('error', 'Please choose a project type.'); return; }
+
+      const required = { org: 'Organization', title: 'Project title', email: 'Contact email', desc: 'Description' };
+      let hasError = false;
+      for (const [k, label] of Object.entries(required)) {
+        if (!String(fd.get(k) || '').trim()) { markFieldError(k, `${label} is required.`); hasError = true; }
+      }
+
+      const emailVal = String(fd.get('email') || '').trim();
+      if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+        markFieldError('email', 'Please enter a valid email address.');
+        hasError = true;
+      }
+
+      if (hasError) { showMsg('error', 'Please fix the highlighted fields.'); return; }
+
+      const payload = Object.fromEntries(fd.entries());
       console.log('Draft payload →', payload);
-      alert('Draft created. In a real deployment this would open a GitHub issue with your details.');
+      showMsg('success', 'Draft created! In a real deployment this would open a GitHub issue with your details.');
       form.reset();
       applyTypeConfig('service');
     });
+
     document.getElementById('y').textContent = new Date().getFullYear();
   </script>
 </body>
