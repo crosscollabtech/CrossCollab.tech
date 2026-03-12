@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" id="top">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -23,6 +23,7 @@
       --glow: 0 0 12px rgba(112, 166, 153, 0.45), 0 0 28px rgba(232, 115, 36, 0.18);
     }
     *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     html, body { height: 100%; }
     body {
       margin: 0;
@@ -187,6 +188,34 @@
     .field-error-msg { color: var(--title); font-size: .8rem; margin-top: .2rem; }
     .hp-field { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; overflow: hidden; }
 
+    /* Back to top */
+    .back-to-top { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 30; background: linear-gradient(120deg, #e87324, #f39d4c); color: #0f0d26; border: none; border-radius: 50%; width: 3rem; height: 3rem; font-size: 1.3rem; cursor: pointer; box-shadow: var(--glow), 0 4px 16px rgba(0,0,0,.4); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; transform: translateY(8px); }
+    .back-to-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .back-to-top:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+    /* Search bar */
+    .search-bar { position: relative; margin-bottom: .6rem; }
+    .search-bar input { width: 100%; padding: .65rem 1rem .65rem 2.4rem; background: rgba(20,20,47,.85); border: 1px solid var(--border); border-radius: 999px; color: var(--text); font-family: inherit; font-size: .9rem; transition: border-color .18s; }
+    .search-bar input::placeholder { color: var(--muted); opacity: .7; }
+    .search-bar input:focus { border-color: var(--accent); outline: none; }
+    .search-bar::before { content: "\2315"; position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 1.1rem; pointer-events: none; }
+
+    /* Skeleton loading */
+    .skeleton-card { background: linear-gradient(170deg, rgba(20,20,47,.95), rgba(16,15,36,.92)); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem; overflow: hidden; }
+    .skeleton-line { height: .9rem; border-radius: 6px; background: linear-gradient(90deg, rgba(45,43,90,.5) 25%, rgba(112,166,153,.12) 50%, rgba(45,43,90,.5) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; margin-bottom: .6rem; }
+    .skeleton-line.short { width: 40%; }
+    .skeleton-line.medium { width: 70%; }
+    .skeleton-line.long { width: 95%; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* Card metadata row */
+    .card-meta-row { display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; margin-top: .4rem; color: var(--muted); font-size: .8rem; }
+    .card-meta-row span { display: inline-flex; align-items: center; gap: .25rem; }
+
+    /* Language toggle */
+    .lang-toggle { background: rgba(20,20,47,.8); border: 1px solid var(--border); color: var(--muted); padding: .3rem .6rem; border-radius: .5rem; cursor: pointer; font-family: inherit; font-size: .8rem; transition: border-color .18s, color .18s; }
+    .lang-toggle:hover { border-color: var(--accent); color: var(--text); }
+
     footer { border-top: 1px solid var(--border); color: var(--muted); padding: 2rem 0; background: rgba(12,11,28,.85); position: relative; z-index: 2; }
     :focus-visible { outline: 3px solid color-mix(in srgb,var(--accent) 55%, transparent); outline-offset: 2px; }
 
@@ -257,6 +286,7 @@
               GitHub
             </a>
           </li>
+          <li><button id="langBtn" class="lang-toggle" aria-label="Switch language">ES</button></li>
         </ul>
       </nav>
     </div>
@@ -270,15 +300,15 @@
       <div class="bezel console-shell" role="presentation">
         <div class="console-body">
           <div class="console-line"><span class="prompt">$</span><span>mission.intro()</span></div>
-          <div class="console-line"><span class="prompt">⤷</span><span>Code with purpose. Build for the Kingdom.</span></div>
-          <div class="console-line"><span class="prompt">⤷</span><span>CrossCollab connects ministries, NGOs, and churches with Christian developers to build open‑source tools.</span></div>
-          <div class="console-line"><span class="prompt">⤷</span><span>Browse projects, join a team, or submit a need.</span></div>
-          <div class="console-line"><span class="prompt">$</span><span>mission.ready()</span><span class="blink">▌</span></div>
+          <div class="console-line"><span class="prompt">⤷</span><span data-i18n="hero_tagline">Code with purpose. Build for the Kingdom.</span></div>
+          <div class="console-line"><span class="prompt">⤷</span><span data-i18n="hero_desc">CrossCollab connects ministries, NGOs, and churches with Christian developers to build open&#x2011;source tools.</span></div>
+          <div class="console-line"><span class="prompt">⤷</span><span data-i18n="hero_cta">Browse projects, join a team, or submit a need.</span></div>
+          <div class="console-line"><span class="prompt">$</span><span>mission.ready()</span><span class="blink">&#x258C;</span></div>
         </div>
       </div>
       <div class="actions">
-        <a class="btn btn-primary" href="#projects">Browse projects</a>
-        <a class="btn btn-ghost" href="#submit">Submit a project</a>
+        <a class="btn btn-primary" href="#projects" data-i18n="btn_browse">Browse projects</a>
+        <a class="btn btn-ghost" href="#submit" data-i18n="btn_submit">Submit a project</a>
       </div>
       <div class="stat-stack">
         <div class="stat"><strong>GitHub‑first</strong><span>Issues, milestones, and PR etiquette baked in.</span></div>
@@ -290,30 +320,35 @@
 
   <section id="projects" aria-labelledby="projects-title">
     <div class="container">
-      <h2 id="projects-title">Featured missions</h2>
+      <h2 id="projects-title" data-i18n="projects_title">Featured missions</h2>
+      <div class="search-bar">
+        <input id="projectSearch" type="search" placeholder="Search projects..." aria-label="Search projects" data-i18n-placeholder="search_placeholder" />
+      </div>
       <div class="filter-bar" role="toolbar" aria-label="Filter projects by language">
         <button class="filter-btn active" data-filter="all">All</button>
       </div>
       <div id="projectGrid" class="grid cards">
-        <p class="projects-loading">Loading projects from GitHub&hellip;</p>
+        <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line medium"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div>
+        <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line medium"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div>
+        <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line medium"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div>
       </div>
     </div>
   </section>
 
   <section id="how" aria-labelledby="how-title">
     <div class="container">
-      <h2 id="how-title">Control room: how it works</h2>
+      <h2 id="how-title" data-i18n="how_title">Control room: how it works</h2>
       <div class="steps">
-        <div class="step"><h3>1. Submit</h3><p>Ministries post a need. We seed a GitHub repo with templates and labels.</p></div>
-        <div class="step"><h3>2. Match</h3><p>Contributors filter by skills and time. Good‑first‑issues prioritized.</p></div>
-        <div class="step"><h3>3. Build</h3><p>Open PRs. Clear milestones. Transparent progress and impact.</p></div>
+        <div class="step"><h3 data-i18n="step1_title">1. Submit</h3><p data-i18n="step1_desc">Ministries post a need. We seed a GitHub repo with templates and labels.</p></div>
+        <div class="step"><h3 data-i18n="step2_title">2. Match</h3><p data-i18n="step2_desc">Contributors filter by skills and time. Good-first-issues prioritized.</p></div>
+        <div class="step"><h3 data-i18n="step3_title">3. Build</h3><p data-i18n="step3_desc">Open PRs. Clear milestones. Transparent progress and impact.</p></div>
       </div>
     </div>
   </section>
 
   <section id="submit" aria-labelledby="submit-title">
     <div class="container">
-      <h2 id="submit-title">Submit a project</h2>
+      <h2 id="submit-title" data-i18n="submit_title">Submit a project</h2>
       <p class="meta" style="margin-bottom:1rem">Pick the path that fits your need—quick service requests or full build projects.</p>
       <div class="grid cards" style="margin-bottom:1.2rem">
         <article class="card">
@@ -362,7 +397,7 @@
 
   <section id="about" aria-labelledby="about-title">
     <div class="container">
-      <h2 id="about-title">About CrossCollab</h2>
+      <h2 id="about-title" data-i18n="about_title">About CrossCollab</h2>
       <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem">
         <div class="card"><h3>Open source first</h3><p>Licenses default to MIT/Apache‑2. All work lives on GitHub. Transparency and reuse drive impact.</p></div>
         <div class="card"><h3>Faith + craft</h3><p>We pair clear doctrine‑safe guidelines with professional software practices and security basics.</p></div>
@@ -382,37 +417,131 @@
     </div>
   </footer>
 
+  <button class="back-to-top" id="toTop" aria-label="Back to top">&uarr;</button>
+
   <script>
+    /* ── i18n ── */
+    const i18n = {
+      en: {
+        projects_title: 'Featured missions',
+        search_placeholder: 'Search projects...',
+        how_title: 'Control room: how it works',
+        step1_title: '1. Submit', step1_desc: 'Ministries post a need. We seed a GitHub repo with templates and labels.',
+        step2_title: '2. Match', step2_desc: 'Contributors filter by skills and time. Good-first-issues prioritized.',
+        step3_title: '3. Build', step3_desc: 'Open PRs. Clear milestones. Transparent progress and impact.',
+        submit_title: 'Submit a project',
+        about_title: 'About CrossCollab',
+        hero_tagline: 'Code with purpose. Build for the Kingdom.',
+        hero_desc: 'CrossCollab connects ministries, NGOs, and churches with Christian developers to build open\u2011source tools.',
+        hero_cta: 'Browse projects, join a team, or submit a need.',
+        btn_browse: 'Browse projects',
+        btn_submit: 'Submit a project',
+        no_match: 'No projects match this filter.',
+        open_repo: 'Open repo',
+        help_btn: 'I want to help',
+        no_desc: 'No description yet.',
+      },
+      es: {
+        projects_title: 'Misiones destacadas',
+        search_placeholder: 'Buscar proyectos...',
+        how_title: 'Centro de control: como funciona',
+        step1_title: '1. Enviar', step1_desc: 'Los ministerios publican una necesidad. Creamos un repositorio de GitHub con plantillas y etiquetas.',
+        step2_title: '2. Conectar', step2_desc: 'Los colaboradores filtran por habilidades y tiempo. Se priorizan los issues para principiantes.',
+        step3_title: '3. Construir', step3_desc: 'PRs abiertos. Hitos claros. Progreso e impacto transparentes.',
+        submit_title: 'Enviar un proyecto',
+        about_title: 'Acerca de CrossCollab',
+        hero_tagline: 'Programa con proposito. Construye para el Reino.',
+        hero_desc: 'CrossCollab conecta ministerios, ONGs e iglesias con desarrolladores cristianos para crear herramientas de codigo abierto.',
+        hero_cta: 'Explora proyectos, unete a un equipo o envia una necesidad.',
+        btn_browse: 'Explorar proyectos',
+        btn_submit: 'Enviar un proyecto',
+        no_match: 'Ningun proyecto coincide con este filtro.',
+        open_repo: 'Ver repositorio',
+        help_btn: 'Quiero ayudar',
+        no_desc: 'Sin descripcion aun.',
+      }
+    };
+    let currentLang = 'en';
+
+    function applyLang(lang) {
+      currentLang = lang;
+      const strings = i18n[lang] || i18n.en;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (strings[key]) el.textContent = strings[key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.dataset.i18nPlaceholder;
+        if (strings[key]) el.placeholder = strings[key];
+      });
+      const langBtn = document.getElementById('langBtn');
+      langBtn.textContent = lang === 'en' ? 'ES' : 'EN';
+      langBtn.setAttribute('aria-label', lang === 'en' ? 'Cambiar a espanol' : 'Switch to English');
+      // Re-render project cards with current lang
+      applyFilters();
+    }
+
+    document.getElementById('langBtn')?.addEventListener('click', () => {
+      applyLang(currentLang === 'en' ? 'es' : 'en');
+    });
+
+    /* ── Back to top ── */
+    const toTopBtn = document.getElementById('toTop');
+    window.addEventListener('scroll', () => {
+      toTopBtn.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
+    toTopBtn?.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
     /* ── GitHub API: live project cards ── */
     const GITHUB_ORG = 'crosscollabtech';
     const projectGrid = document.getElementById('projectGrid');
     const filterBar = document.querySelector('.filter-bar');
+    const searchInput = document.getElementById('projectSearch');
     let allRepos = [];
 
     const fallbackProjects = [
-      { name: 'Community Needs Map', lang: 'JavaScript', desc: 'Church-run directory of local needs and services. Contributors: frontend, mapbox integration, accessibility.', url: 'https://github.com/crosscollabtech', topics: ['good first issue', 'help wanted'] },
-      { name: 'Prayer & Care Analytics', lang: 'Python', desc: 'Anonymous metrics for prayer requests and follow-ups. Needs ETL and dashboard contributors.', url: 'https://github.com/crosscollabtech', topics: ['docs', 'backend'] },
-      { name: 'Mission Trip Toolkit', lang: 'Kotlin', desc: 'Offline-first app for itineraries, checklists, and translation snippets. Contributors needed for sync and UI.', url: 'https://github.com/crosscollabtech', topics: ['UX', 'translation'] }
+      { name: 'Community Needs Map', lang: 'JavaScript', desc: 'Church-run directory of local needs and services. Contributors: frontend, mapbox integration, accessibility.', url: 'https://github.com/crosscollabtech', topics: ['good first issue', 'help wanted'], stars: 0, forks: 0, updated: '' },
+      { name: 'Prayer & Care Analytics', lang: 'Python', desc: 'Anonymous metrics for prayer requests and follow-ups. Needs ETL and dashboard contributors.', url: 'https://github.com/crosscollabtech', topics: ['docs', 'backend'], stars: 0, forks: 0, updated: '' },
+      { name: 'Mission Trip Toolkit', lang: 'Kotlin', desc: 'Offline-first app for itineraries, checklists, and translation snippets. Contributors needed for sync and UI.', url: 'https://github.com/crosscollabtech', topics: ['UX', 'translation'], stars: 0, forks: 0, updated: '' }
     ];
+
+    function timeAgo(dateStr) {
+      if (!dateStr) return '';
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const days = Math.floor(diff / 86400000);
+      if (days < 1) return 'today';
+      if (days === 1) return '1 day ago';
+      if (days < 30) return days + ' days ago';
+      const months = Math.floor(days / 30);
+      return months === 1 ? '1 month ago' : months + ' months ago';
+    }
 
     function renderCard(repo) {
       const lang = repo.lang || 'Misc';
+      const strings = i18n[currentLang] || i18n.en;
       const topics = (repo.topics || []).map(t => `<span class=”chip”>${t}</span>`).join(' ');
+      const updatedText = timeAgo(repo.updated);
       return `<article class=”card” data-lang=”${lang}”>
         <div class=”chip”>${lang}</div>
         <h3>${repo.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</h3>
-        <p>${repo.desc || 'No description yet.'}</p>
+        <p>${repo.desc || strings.no_desc}</p>
         ${topics ? `<p class=”meta”>Topics: ${topics}</p>` : ''}
+        <div class=”card-meta-row”>
+          ${repo.stars ? `<span>\u2605 ${repo.stars}</span>` : ''}
+          ${repo.forks ? `<span>\u2442 ${repo.forks}</span>` : ''}
+          ${updatedText ? `<span>Updated ${updatedText}</span>` : ''}
+        </div>
         <div style=”display:flex;gap:.6rem;margin-top:.6rem”>
-          <a class=”btn btn-ghost” href=”${repo.url}” target=”_blank” rel=”noopener”>Open repo</a>
-          <a class=”btn btn-primary” href=”${repo.url}/issues” target=”_blank” rel=”noopener”>I want to help</a>
+          <a class=”btn btn-ghost” href=”${repo.url}” target=”_blank” rel=”noopener”>${strings.open_repo}</a>
+          <a class=”btn btn-primary” href=”${repo.url}/issues” target=”_blank” rel=”noopener”>${strings.help_btn}</a>
         </div>
       </article>`;
     }
 
     function renderProjects(repos) {
+      const strings = i18n[currentLang] || i18n.en;
       if (!repos.length) {
-        projectGrid.innerHTML = '<p class=”projects-empty”>No projects match this filter.</p>';
+        projectGrid.innerHTML = `<p class=”projects-empty”>${strings.no_match}</p>`;
         return;
       }
       projectGrid.innerHTML = repos.map(renderCard).join('');
@@ -424,15 +553,33 @@
         langs.map(l => `<button class=”filter-btn” data-filter=”${l}”>${l}</button>`).join('');
     }
 
+    function getActiveFilter() {
+      return filterBar.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+    }
+
+    function applyFilters() {
+      const filter = getActiveFilter();
+      const query = (searchInput?.value || '').toLowerCase().trim();
+      let filtered = filter === 'all' ? allRepos : allRepos.filter(r => (r.lang || 'Misc') === filter);
+      if (query) {
+        filtered = filtered.filter(r =>
+          r.name.toLowerCase().includes(query) ||
+          (r.desc || '').toLowerCase().includes(query) ||
+          (r.topics || []).some(t => t.toLowerCase().includes(query))
+        );
+      }
+      renderProjects(filtered);
+    }
+
     filterBar?.addEventListener('click', (e) => {
       const btn = e.target.closest('.filter-btn');
       if (!btn) return;
       filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      const filter = btn.dataset.filter;
-      const filtered = filter === 'all' ? allRepos : allRepos.filter(r => (r.lang || 'Misc') === filter);
-      renderProjects(filtered);
+      applyFilters();
     });
+
+    searchInput?.addEventListener('input', applyFilters);
 
     async function loadProjects() {
       try {
@@ -441,7 +588,7 @@
         const data = await res.json();
         allRepos = data
           .filter(r => !r.fork && !r.archived)
-          .map(r => ({ name: r.name, lang: r.language || 'Misc', desc: r.description, url: r.html_url, topics: r.topics || [] }));
+          .map(r => ({ name: r.name, lang: r.language || 'Misc', desc: r.description, url: r.html_url, topics: r.topics || [], stars: r.stargazers_count || 0, forks: r.forks_count || 0, updated: r.updated_at || '' }));
         if (!allRepos.length) throw new Error('empty');
       } catch {
         allRepos = fallbackProjects;
