@@ -985,8 +985,6 @@
           <button type="reset" class="btn btn-ghost">Reset</button>
         </div>
         <div id="formMsg" class="form-msg" role="status" aria-live="polite"></div>
-        <p class="meta">Note: In MVP this creates a GitHub issue with details; later it can scaffold a repo via a GitHub
-          App.</p>
       </form>
     </div>
   </section>
@@ -1128,21 +1126,21 @@
       const strings = i18n[currentLang] || i18n.en;
       const topics = (repo.topics || []).map(t => `<span class=”chip”>${t}</span>`).join(' ');
       const updatedText = timeAgo(repo.updated);
-      return `<article class=”card” data-lang=”${lang}”>
-        <div style=”display:flex;gap:.5rem;align-items:center;flex-wrap:wrap”>
-          <span class=”chip lang-chip”>${lang}</span>
+      return `<article class="card" data-lang="${lang}">
+        <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+          <span class="chip lang-chip">${lang}</span>
           ${topics}
         </div>
         <h3>${repo.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</h3>
         <p>${repo.desc || strings.no_desc}</p>
-        <div class=”card-meta-row”>
+        <div class="card-meta-row">
           ${repo.stars ? `<span>\u2605 ${repo.stars}</span>` : ''}
           ${repo.forks ? `<span>\u2442 ${repo.forks}</span>` : ''}
           ${updatedText ? `<span>Updated ${updatedText}</span>` : ''}
         </div>
-        <div class=”card-actions” style=”display:flex;gap:.6rem;flex-wrap:wrap”>
-          <a class=”btn btn-ghost” href=”${repo.url}” target=”_blank” rel=”noopener”>${strings.open_repo}</a>
-          <a class=”btn btn-primary” href=”${repo.url}/issues” target=”_blank” rel=”noopener”>${strings.help_btn}</a>
+        <div class="card-actions" style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <a class="btn btn-ghost" href="${repo.url}" target="_blank" rel="noopener">${strings.open_repo}</a>
+          <a class="btn btn-primary" href="${repo.url}/issues" target="_blank" rel="noopener">${strings.help_btn}</a>
         </div>
       </article>`;
     }
@@ -1150,7 +1148,7 @@
     function renderProjects(repos) {
       const strings = i18n[currentLang] || i18n.en;
       if (!repos.length) {
-        projectGrid.innerHTML = `<p class=”projects-empty”>${strings.no_match}</p>`;
+        projectGrid.innerHTML = `<p class="projects-empty">${strings.no_match}</p>`;
         return;
       }
       projectGrid.innerHTML = repos.map(renderCard).join('');
@@ -1193,19 +1191,21 @@
     const typeHint = document.getElementById('typeHint');
     const typeFields = document.getElementById('typeFields');
     const formMsg = document.getElementById('formMsg');
-    const descLabel = form?.querySelector('[data-role=”desc-label”] span');
+    const descLabel = form?.querySelector('[data-role="desc-label"] span');
     const descInput = form?.elements['desc'];
+    const submitBtn = form?.querySelector('button[type="submit"]');
     const typeConfigs = {
       service: {
         descLabel: 'What do you need done?',
         placeholder: 'Describe the job in plain language. Example: “Please tidy our donor spreadsheet and remove duplicates.”',
+        submitText: 'Create Issue on GitHub',
         extras: `
-          <label><span>Current tools (optional)</span><input name=”tools” placeholder=”Tell us what you're using now, e.g., Zoom, Google Sheets, Mailchimp” /></label>
+          <label><span>Current tools (optional)</span><input name="tools" placeholder="Tell us what you're using now, e.g., Zoom, Google Sheets, Mailchimp" /></label>
           <label><span>How soon do you need help? (optional)</span>
-            <select name=”timeline”>
-              <option value=””>No rush / flexible</option>
-              <option value=”this-month”>This month</option>
-              <option value=”this-week”>This week</option>
+            <select name="timeline">
+              <option value="">No rush / flexible</option>
+              <option value="this-month">This month</option>
+              <option value="this-week">This week</option>
             </select>
           </label>
         `
@@ -1213,25 +1213,28 @@
       build: {
         descLabel: 'What are you hoping to build?',
         placeholder: 'Example: “A simple site where volunteers can sign up for shifts and we can export a list for emailing.”',
+        submitText: 'Create Project Repository',
         extras: `
-          <label><span>Who will use it? (optional)</span><input name=”audience” placeholder=”Example: Volunteers scheduling shifts; pastors reviewing notes” /></label>
-          <label><span>Content & data (optional)</span><textarea name=”content” rows=”3” placeholder=”Links to existing materials, forms, or data sources. Plain language is fine.”></textarea></label>
+          <label><span>GitHub Username (optional but recommended)</span><input name="githubUser" placeholder="Your username to become a repo contributor" /></label>
+          <label><span>Who will use it? (optional)</span><input name="audience" placeholder="Example: Volunteers scheduling shifts; pastors reviewing notes" /></label>
+          <label><span>Content & data (optional)</span><textarea name="content" rows="3" placeholder="Links to existing materials, forms, or data sources. Plain language is fine."></textarea></label>
           <label><span>Deployment preference (optional)</span>
-            <select name=”hosting”>
-              <option value=””>Help me pick</option>
-              <option value=”website”>Website</option>
-              <option value=”mobile”>Mobile app</option>
-              <option value=”dashboard”>Dashboard / report</option>
+            <select name="hosting">
+              <option value="">Help me pick</option>
+              <option value="website">Website</option>
+              <option value="mobile">Mobile app</option>
+              <option value="dashboard">Dashboard / report</option>
             </select>
           </label>
         `
       }
     };
 
-    function showMsg(type, text) {
+    function showMsg(type, text, isHtml = false) {
       formMsg.className = 'form-msg ' + type;
-      formMsg.textContent = text;
-      if (type === 'success') setTimeout(() => { formMsg.className = 'form-msg'; formMsg.textContent = ''; }, 6000);
+      if (isHtml) formMsg.innerHTML = text;
+      else formMsg.textContent = text;
+      if (type === 'success' && !isHtml) setTimeout(() => { formMsg.className = 'form-msg'; formMsg.textContent = ''; }, 6000);
     }
 
     function clearErrors() {
@@ -1257,15 +1260,16 @@
       if (descLabel) descLabel.textContent = `${config.descLabel} *`;
       if (descInput) descInput.placeholder = config.placeholder;
       if (typeFields) typeFields.innerHTML = config.extras;
+      if (submitBtn) submitBtn.textContent = config.submitText || 'Create draft on GitHub';
     };
 
-    const typeRadios = form?.querySelectorAll('input[name=”projectType”]');
+    const typeRadios = form?.querySelectorAll('input[name="projectType"]');
     typeRadios?.forEach(r => r.addEventListener('change', (e) => applyTypeConfig(e.target.value)));
-    applyTypeConfig(form?.querySelector('input[name=”projectType”]:checked')?.value || 'service');
+    applyTypeConfig(form?.querySelector('input[name="projectType"]:checked')?.value || 'service');
 
     form?.addEventListener('reset', () => {
       clearErrors();
-      setTimeout(() => applyTypeConfig(form.querySelector('input[name=”projectType”]:checked')?.value || 'service'), 0);
+      setTimeout(() => applyTypeConfig(form.querySelector('input[name="projectType"]:checked')?.value || 'service'), 0);
     });
 
     const WORKER_URL = 'https://crosscollab-form-handler.crosscollabtech.workers.dev'; // Paste your deployed Cloudflare Worker URL here (e.g. 'https://crosscollab-form-handler.your-username.workers.dev')
@@ -1277,11 +1281,10 @@
       // Honeypot check
       if (form.elements['website']?.value) return;
 
-      const submitBtn = form.querySelector('button[type="submit"]');
       const originalBtnText = submitBtn.textContent;
 
       const fd = new FormData(form);
-      const selectedType = form.querySelector('input[name=”projectType”]:checked')?.value;
+      const selectedType = form.querySelector('input[name="projectType"]:checked')?.value;
       if (!selectedType) { showMsg('error', 'Please choose a project type.'); return; }
 
       const required = { org: 'Organization', title: 'Project title', email: 'Contact email', desc: 'Description' };
@@ -1322,9 +1325,12 @@
           throw new Error(data.error || 'Server returned an error');
         }
 
-        showMsg('success', 'Your project requirement was successfully submitted!');
         form.reset();
-        applyTypeConfig('service');
+        if (data.issueUrl) {
+          showMsg('success', `Your project requirement was successfully submitted! <br><br> <a href="${data.issueUrl}" target="_blank" style="text-decoration:underline; font-weight:bold; color:var(--text);">View it on GitHub &rarr;</a>`, true);
+        } else {
+          showMsg('success', 'Your project requirement was successfully submitted!');
+        }
       } catch (err) {
         console.error('Submission error:', err);
         showMsg('error', 'Failed to submit form. Please try again later.');

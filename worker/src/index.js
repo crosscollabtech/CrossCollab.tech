@@ -55,7 +55,6 @@ export default {
 
       const githubRepoOwner = env.GITHUB_REPO_OWNER || "crosscollabtech";
       const githubRepoName = env.GITHUB_REPO_NAME || "CrossCollab.tech";
-      const githubApiUrl = `https://api.github.com/repos/${githubRepoOwner}/${githubRepoName}/issues`;
       
       if (!env.GITHUB_TOKEN) {
         return new Response(JSON.stringify({ error: "GITHUB_TOKEN secret is not set in the worker." }), {
@@ -64,7 +63,63 @@ export default {
         });
       }
 
-      const githubResponse = await fetch(githubApiUrl, {
+      let githubApiUrl;
+      let reqBody;
+
+      let usernameToInvite = null;
+
+      if (data.projectType === 'build') {
+        if (data.githubUser) {
+          usernameToInvite = data.githubUser;
+        } else if (data.email) {
+          const searchUrl = `https://api.github.com/search/users?q=${encodeURIComponent(data.email)}`;
+          const searchResponse = await fetch(searchUrl, {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+              "User-Agent": "CrossCollab-Cloudflare-Worker"
+            }
+          });
+          
+          if (searchResponse.ok) {
+            const searchData = await searchResponse.json();
+            if (searchData.total_count > 0 && searchData.items && searchData.items[0]) {
+              usernameToInvite = searchData.items[0].login;
+            }
+          }
+        }
+
+        if (!usernameToInvite) {
+          return new Response(JSON.stringify({ 
+            error: "GITHUB_ACCOUNT_REQUIRED", 
+            message: "A GitHub account is strictly required to scaffold a project repository. We couldn't find a GitHub account associated with your email. Please add your GitHub Username below or create a free account." 
+          }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        const newRepoName = (data.title || "new-project").toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        // For crosscollabtech organization
+        githubApiUrl = `https://api.github.com/orgs/${githubRepoOwner}/repos`;
+        reqBody = {
+          name: newRepoName,
+          description: `Built for ${data.org}: ` + data.desc.substring(0, 250),
+          private: false,
+          has_issues: true,
+          has_projects: true,
+          auto_init: true
+        };
+      } else {
+        githubApiUrl = `https://api.github.com/repos/${githubRepoOwner}/${githubRepoName}/issues`;
+        reqBody = {
+          title: issueTitle,
+          body: bodyText,
+          labels: ['service request', 'needs triage']
+        };
+      }
+
+      let githubResponse = await fetch(githubApiUrl, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
@@ -72,25 +127,62 @@ export default {
           "Accept": "application/vnd.github.v3+json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          title: issueTitle,
-          body: bodyText,
-          labels: [data.projectType === 'build' ? 'project request' : 'service request', 'needs triage']
-        }),
+        body: JSON.stringify(reqBody),
       });
+
+      // If org repo creation fails, fallback to user repo creation (in case GITHUB_TOKEN belongs to a normal user rather than an org)
+      if (data.projectType === 'build' && githubResponse.status === 404) {
+        githubApiUrl = `https://api.github.com/user/repos`;
+        githubResponse = await fetch(githubApiUrl, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+            "User-Agent": "CrossCollab-Cloudflare-Worker",
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(reqBody),
+        });
+      }
 
       if (!githubResponse.ok) {
         const errText = await githubResponse.text();
         console.error("GitHub API Error:", errText);
-        return new Response(JSON.stringify({ error: "Failed to create issue on GitHub" }), {
+        return new Response(JSON.stringify({ error: "Failed to create resource on GitHub" }), {
           status: 502,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
-      const issueData = await githubResponse.json();
+      const responseData = await githubResponse.json();
 
-      return new Response(JSON.stringify({ success: true, issueUrl: issueData.html_url }), {
+      let collaboratorAdded = false;
+      let collaboratorMsg = usernameToInvite ? `Attempting to invite ${usernameToInvite}` : "";
+
+      if (data.projectType === 'build' && usernameToInvite) {
+        const repoFullName = responseData.full_name; // e.g. 'owner/repo'
+        const collabUrl = `https://api.github.com/repos/${repoFullName}/collaborators/${usernameToInvite}`;
+        const collabResponse = await fetch(collabUrl, {
+          method: "PUT",
+          headers: {
+            "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+            "User-Agent": "CrossCollab-Cloudflare-Worker",
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ permission: 'maintain' })
+        });
+            
+        if (collabResponse.ok || collabResponse.status === 201 || collabResponse.status === 204) {
+          collaboratorAdded = true;
+          collaboratorMsg = `Invite sent to ${usernameToInvite}`;
+        } else {
+          collaboratorMsg = "Failed to add collaborator. The username may be invalid.";
+          console.error("Failed to add collaborator:", await collabResponse.text());
+        }
+      }
+
+      return new Response(JSON.stringify({ success: true, issueUrl: responseData.html_url, collaboratorAdded, collaboratorMsg }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
